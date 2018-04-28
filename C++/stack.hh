@@ -126,37 +126,44 @@ public:
 		return x;
 	}
 	
+	/* ( x -- x x ) */
 	inline void dup(void)
 	{
 		this->pick(0);
 	}
 	
+	/* ( x y -- x ) */
 	inline void drop(void)
 	{
 		this->pop();
 	}
-	
+
+	/* ( x y -- y x ) */
 	inline void swap(void)
 	{
 		this->roll(1);
 	}
-	
+
+	/* ( x y -- x y x ) */
 	inline void over(void)
 	{
 		this->pick(1);
 	}
-	
+
+	/* ( x y z -- y z x ) */
 	inline void rot(void)
 	{
 		this->roll(2);
 	}
-	
+
+	/* ( x y z -- x z ) */
 	inline void nip(void) 
 	{
 		this->swap();
 		this->drop();
 	}
 	
+	/* ( x y z -- x z y z ) */
 	inline void tuck(void)
 	{
 		this->swap();

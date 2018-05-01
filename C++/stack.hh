@@ -64,7 +64,7 @@ public:
 			(
 				memory, 
 				this->_base, 
-				this->_capacity > size ? size : this->_capacity * sizeof(T)
+				(this->_capacity > size ? size : this->_capacity) * sizeof(T)
 			);
 			delete[] this->_base;
 		}

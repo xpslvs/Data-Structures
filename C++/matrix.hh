@@ -149,6 +149,13 @@ public:
 		return (*this); // Not implemented
 	}
 
+	Matrix adjugate(void) const
+	{
+		static_assert(C == R, "Adjugate is only defined for square matrices");
+
+		return (*this); // Not implemented
+	}
+
 	bool equals(const Matrix &a) const
 	{
 		return !std::memcmp(this->_elem, a._elem, R * C * sizeof(T));

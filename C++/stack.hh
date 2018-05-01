@@ -55,8 +55,9 @@ public:
 	 */
 	void allocate(unsigned size)
 	{
-		T *memory = new T[size];
+		T *memory       = new T[size];
 		unsigned offset = this->size();
+
 		if(this->_base != nullptr)
 		{
 			std::memcpy
@@ -126,44 +127,51 @@ public:
 		return x;
 	}
 	
-	/* ( x -- x x ) */
+	/* ( n1 n2 -- n1 n2 n2 )
+	 */
 	inline void dup(void)
 	{
 		this->pick(0);
 	}
 	
-	/* ( x y -- x ) */
+	/* ( n1 n2 -- n1 )
+	 */
 	inline void drop(void)
 	{
 		this->pop();
 	}
 
-	/* ( x y -- y x ) */
+	/* ( n1 n2 n3 -- n1 n3 n2 )
+	 */
 	inline void swap(void)
 	{
 		this->roll(1);
 	}
 
-	/* ( x y -- x y x ) */
+	/* ( n1 n2 -- n1 n2 n1 )
+	 */
 	inline void over(void)
 	{
 		this->pick(1);
 	}
 
-	/* ( x y z -- y z x ) */
+	/* ( n1 n2 n3 -- n2 n3 n1 )
+	 */
 	inline void rot(void)
 	{
 		this->roll(2);
 	}
 
-	/* ( x y z -- x z ) */
+	/* ( n1 n2 n3 -- n1 n3 )
+	 */
 	inline void nip(void) 
 	{
 		this->swap();
 		this->drop();
 	}
 	
-	/* ( x y z -- x z y z ) */
+	/* ( n1 n2 n3 -- n1 n3 n2 n3 )
+	 */
 	inline void tuck(void)
 	{
 		this->swap();

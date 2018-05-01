@@ -207,4 +207,8 @@ private:
 	T _imag;
 };
 
+typedef Complex<float>       Complexf;
+typedef Complex<double>      Complexlf;
+typedef Complex<long double> ComplexLf;
+
 #endif /* COMPLEX_HH */

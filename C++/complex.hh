@@ -4,6 +4,13 @@
 
 #include <cmath>
 
+/* An implementation of complex numbers with support for 
+ * complex exponents, along with some fast implementations
+ * for a few specific functions
+ * Defines typedefs for float, double and long double
+ * Uses operator overloads for the most common arithmetic functions
+ * Depends on <cmath> header
+ */
 template <typename T>
 class Complex
 {
@@ -13,36 +20,56 @@ public:
 		this->set(real, imag);
 	}
 
-	Complex add(const Complex &z)
+	Complex add(const Complex &z) const
 	{
-		this->_real += z.real();
-		this->_imag += z.imag();
-		return *this;
+		Complex w{*this};
+		w._real += z.real();
+		w._imag += z.imag();
+		return w;
 	}
 
-	Complex subtract(const Complex &z)
+	Complex subtract(const Complex &z) const
 	{
-		return this->add(-z);
+		Complex w{*this};
+		w._real -= z.real();
+		w._imag -= z.imag();
+		return w;
 	}
 
-	Complex multiply(const Complex &z)
+	Complex multiply(const Complex &z) const
 	{
 		Complex w{};
 		w._real = (this->real() * z.real()) - (this->imag() * z.imag());
-		w._imag = (this->real() + this->imag()) * (z.real() + z.imag()) - w.real();
-		return *this = w;
+		w._imag = (this->imag() * z.real()) + (this->real() * z.imag());
+		return w;
 	}
 
-	Complex divide(const Complex &z)
+	Complex multiply(const T &c) const
+	{
+		Complex z{*this};
+		z._real *= c;
+		z._imag *= c;
+		return z;
+	}
+
+	Complex divide(const Complex &z) const
 	{
 		Complex w{};
 		w._real = this->real() * z.real() + this->imag() * z.imag();
 		w._imag = this->imag() * z.real() - this->real() * z.imag();
 		w._real /= z.norm();
 		w._imag /= z.norm();
-		return *this = w;
+		return w;
 	}
-
+	
+	Complex divide(const T &c) const
+	{
+		Complex z{*this};
+		z._real /= c;
+		z._imag /= c;
+		return z;
+	}
+	
 	Complex square(void) const
 	{
 		Complex z{};
@@ -52,10 +79,41 @@ public:
 		return z;
 	}
 
-	Complex cube(void) const
+    Complex pow(const Complex &z) const
+    {
+        Complex w{};
+        w._real = std::cos(z.imag() * std::log(this->modulus()) + z.real() * this->argument());
+        w._imag = std::sin(z.imag() * std::log(this->modulus()) + z.real() * this->argument());
+        w *= std::exp(z.real() * std::log(this->modulus()) - z.imag() * this->argument());
+        return w;
+    }
+
+    Complex pow(const T &c) const
 	{
-		return this->square() * (*this);
+		Complex z{};
+		z._real = std::cos(this->argument() * c);
+		z._imag = std::sin(this->argument() * c);
+		z *= (T)std::pow(this->norm(), c / 2);
+		return z;
 	}
+
+    Complex exp(void) const
+    {
+        Complex z{};
+        z._real = std::cos(this->imag());
+        z._imag = std::sin(this->imag());
+        z *= std::exp(this->real());
+        return z;
+    }
+
+    Complex sqrt(void) const
+    {
+        Complex z{};
+        z._real = std::cos(this->argument() / 2);
+        z._imag = std::sin(this->argument() / 2);
+        z *= (T)std::sqrt(this->modulus());
+        return z;
+    }
 
 	Complex reciprocal(void) const
 	{
@@ -99,7 +157,7 @@ public:
 	}
 
 	/* Casting to other types of complex numbers
-	 * can be done implicitly
+	 * is done implicitly
 	 */
 	template <typename S>
 	operator Complex<S>(void) const
@@ -107,6 +165,8 @@ public:
 		return {(S)this->real(), (S)this->imag()};
 	}
 	
+	/* Casting to real part is done explicitly through casting
+	 */
 	template <typename S>
 	explicit operator S(void) const
 	{
@@ -125,7 +185,7 @@ public:
 
 	inline Complex operator +(void) const
 	{
-		return *this;
+		return (*this);
 	}
 
 	inline Complex operator -(void) const
@@ -135,42 +195,62 @@ public:
 
 	inline Complex operator +(const Complex &z) const
 	{
-		return ((Complex)(*this)).add(z);
+		return this->add(z);
 	}
 
 	inline Complex operator -(const Complex &z) const
 	{
-		return ((Complex)(*this)).subtract(z);
+		return this->subtract(z);
 	}
 
 	inline Complex operator *(const Complex &z) const
 	{
-		return ((Complex)(*this)).multiply(z);
+		return this->multiply(z);
+	}
+
+	inline Complex operator *(const T &c) const
+	{
+		return this->multiply(c);
 	}
 
 	inline Complex operator /(const Complex &z) const
 	{
-		return ((Complex)(*this)).divide(z);
+		return this->divide(z);
+	}
+
+	inline Complex operator /(const T &c) const
+	{
+		return this->divide(c);
 	}
 
 	inline Complex operator +=(const Complex &z)
 	{
-		return this->add(z);
+		return (*this) = (*this) + z;
 	}
 
 	inline Complex operator -=(const Complex &z)
 	{
-		return this->subtract(z);
+		return (*this) = (*this) - z;
 	}
 
 	inline Complex operator *=(const Complex &z)
 	{
-		return this->multiply(z);
+		return (*this) = (*this) * z;
+	}
+
+	inline Complex operator *=(const T &c)
+	{
+		return (*this) = (*this) * c;
 	}
 
 	inline Complex operator /=(const Complex &z)
 	{
-		return this->divide(z);
+		return (*this) = (*this) / z;
+	}
+
+	inline Complex operator /=(const T &c)
+	{
+		return (*this) = (*this) / c;
 	}
 
 	inline bool operator ==(const Complex &z) const
@@ -185,12 +265,12 @@ public:
 
 	inline bool operator >=(const Complex &z) const
 	{
-		return *this == z || *this > z;
+		return this->norm() >= z.norm();
 	}
 
 	inline bool operator <=(const Complex &z) const
 	{
-		return *this == z || *this < z;
+		return this->norm() <= z.norm();
 	}
 
 	inline bool operator >(const Complex &z) const

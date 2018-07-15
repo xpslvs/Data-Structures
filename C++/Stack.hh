@@ -1,4 +1,4 @@
-/* stack.hh */
+/* Stack.hh */
 #ifndef STACK_HH
 #define STACK_HH
 
@@ -61,8 +61,7 @@ public:
 
 		if(this->_base != nullptr)
 		{
-			std::memcpy
-			(
+			std::memcpy(
 				memory, 
 				this->_base, 
 				(this->_capacity > size ? size : this->_capacity) * sizeof(T)
@@ -184,4 +183,4 @@ private:
 	size_t _capacity;
 };
 
-#endif /* STACK_HH */
+#endif

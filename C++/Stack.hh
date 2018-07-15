@@ -1,7 +1,8 @@
-/* stack.hh */
+/* Stack.hh */
 #ifndef STACK_HH
 #define STACK_HH
 
+#include <cstddef>
 #include <cstring>
 #include <exception>
 #include <stdexcept>
@@ -10,7 +11,7 @@ template <typename T>
 class Stack
 {
 public:
-	Stack(unsigned size = 0)
+	Stack(size_t size = 0)
 	{
 		this->_base     = nullptr;
 		this->_pointer  = nullptr;
@@ -53,17 +54,17 @@ public:
 	 * If the new size is smaller than the already allocated size, the data is copied
 	 * from the bottom of the stack up to the new size
 	 */
-	void allocate(unsigned size)
+	void allocate(size_t size)
 	{
-		T *memory = new T[size];
-		unsigned offset = this->size();
+		T *memory     = new T[size];
+		size_t offset = this->size();
+
 		if(this->_base != nullptr)
 		{
-			std::memcpy
-			(
+			std::memcpy(
 				memory, 
 				this->_base, 
-				this->_capacity > size ? size : this->_capacity * sizeof(T)
+				(this->_capacity > size ? size : this->_capacity) * sizeof(T)
 			);
 			delete[] this->_base;
 		}
@@ -78,12 +79,12 @@ public:
 		this->_pointer = this->_base;
 	}
 
-	unsigned size(void) const
+	size_t size(void) const
 	{
-		return (unsigned)(this->_pointer - this->_base);
+		return (size_t)(this->_pointer - this->_base);
 	}
 	
-	unsigned capacity(void) const
+	size_t capacity(void) const
 	{
 		return this->_capacity;
 	}
@@ -102,17 +103,17 @@ public:
 		return *(--this->_pointer);
 	}
 	
-	void pick(unsigned n)
+	void pick(size_t n)
 	{
 		if(this->size() <= n)
 			throw std::underflow_error("Stack underflow");
 		this->push(this->_pointer[-(int)(n+1)]);
 	} 
 
-	void roll(unsigned n)
+	void roll(size_t n)
 	{
 		this->pick(n);
-		for(int i = -(int)(n+2); i <= -2; ++i)
+		for(long long i = -(long long)(n+2); i <= -2; ++i)
 		{
 			this->_pointer[i] = this->_pointer[i+1];
 		}
@@ -126,44 +127,51 @@ public:
 		return x;
 	}
 	
-	/* ( x -- x x ) */
+	/* ( n1 n2 -- n1 n2 n2 )
+	 */
 	inline void dup(void)
 	{
 		this->pick(0);
 	}
 	
-	/* ( x y -- x ) */
+	/* ( n1 n2 -- n1 )
+	 */
 	inline void drop(void)
 	{
 		this->pop();
 	}
 
-	/* ( x y -- y x ) */
+	/* ( n1 n2 n3 -- n1 n3 n2 )
+	 */
 	inline void swap(void)
 	{
 		this->roll(1);
 	}
 
-	/* ( x y -- x y x ) */
+	/* ( n1 n2 -- n1 n2 n1 )
+	 */
 	inline void over(void)
 	{
 		this->pick(1);
 	}
 
-	/* ( x y z -- y z x ) */
+	/* ( n1 n2 n3 -- n2 n3 n1 )
+	 */
 	inline void rot(void)
 	{
 		this->roll(2);
 	}
 
-	/* ( x y z -- x z ) */
+	/* ( n1 n2 n3 -- n1 n3 )
+	 */
 	inline void nip(void) 
 	{
 		this->swap();
 		this->drop();
 	}
 	
-	/* ( x y z -- x z y z ) */
+	/* ( n1 n2 n3 -- n1 n3 n2 n3 )
+	 */
 	inline void tuck(void)
 	{
 		this->swap();
@@ -172,7 +180,7 @@ public:
 private:
 	T *_base;
 	T *_pointer;
-	unsigned _capacity;
+	size_t _capacity;
 };
 
-#endif /* STACK_HH */
+#endif

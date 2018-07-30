@@ -1,4 +1,4 @@
-/* Vector.hh */
+/* vector.hh */
 #ifndef VECTOR_HH
 #define VECTOR_HH
 
